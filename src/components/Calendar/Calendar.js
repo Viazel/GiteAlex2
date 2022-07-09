@@ -96,6 +96,8 @@ export default function Calendar(opt) {
 
         let buttonsa = [...buttons];
 
+        const InnerHtml = new Map();
+
         newArr.forEach(index => {
 
             if(isNaN(index)){
@@ -106,6 +108,7 @@ export default function Calendar(opt) {
                 buttonsa = [...buttonsa, <button key={uuid} id={uuid} disabled></button>]
             }else {
                 const uuid = uuidv4();
+                InnerHtml.set(uuid, index);
                 buttonsa = [...buttonsa, <button key={uuid} id={uuid} onClick={e => cliqued(e)}>{index}</button>]
             }
         })
@@ -129,8 +132,11 @@ export default function Calendar(opt) {
                 if(index !== result){
                     newArr = [...newArr, index];
                 }else {
-                    console.log(result);
-                    newArr = [...newArr, <button key={result.key} style={{background: "blue"}} id={result.key} onClick={e => cliqued(e)}>{index.props.value}</button>];
+                    if(result.props.style === undefined){
+                        newArr = [...newArr, <button key={result.key} style={{background: "blue"}} id={result.key} onClick={e => cliqued(e)}>{InnerHtml.get(result.key)}</button>];
+                    }else {
+                        newArr = [...newArr, <button key={result.key} id={result.key} onClick={e => cliqued(e)}>{InnerHtml.get(result.key)}</button>];
+                    }
                 }
             })
 

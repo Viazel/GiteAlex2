@@ -1,5 +1,6 @@
 import {useEffect, useState} from "react";
 import './Calendar.css'
+import {v4 as uuidv4} from 'uuid';
 
 function numberInMonth(number){
     switch (number) {
@@ -63,6 +64,8 @@ export default function Calendar(opt) {
 
     const [time, SetTime] = useState([]);
 
+    const [buttons, SetButtons] = useState([]);
+
     useEffect(() => {
 
         let newArr = [...time];
@@ -91,6 +94,53 @@ export default function Calendar(opt) {
             }
         }
 
+        let buttonsa = [...buttons];
+
+        newArr.forEach(index => {
+
+            if(isNaN(index)){
+                const uuid = uuidv4();
+                buttonsa = [...buttonsa, <button id={uuid} key={uuid} disabled>{index}</button>];
+            }else if(index === 99){
+                const uuid = uuidv4();
+                buttonsa = [...buttonsa, <button key={uuid} id={uuid} disabled></button>]
+            }else {
+                const uuid = uuidv4();
+                buttonsa = [...buttonsa, <button key={uuid} id={uuid} onClick={e => cliqued(e)}>{index}</button>]
+            }
+        })
+
+        const cliqued = e => {
+
+            let result = undefined;
+
+            buttonsa.map(index => {
+                const id = index.props.id;
+                if(id === e.target.id){
+                    result = index;
+                }
+            })
+
+            if(result === undefined) return;
+
+            let newArr = [];
+
+            buttonsa.map(index => {
+                if(index !== result){
+                    newArr = [...newArr, index];
+                }else {
+                    console.log(result);
+                    newArr = [...newArr, <button key={result.key} style={{background: "blue"}} id={result.key} onClick={e => cliqued(e)}>{index.props.value}</button>];
+                }
+            })
+
+            buttonsa = newArr;
+
+            SetButtons(newArr);
+
+        }
+
+        SetButtons(buttonsa);
         SetTime(newArr);
 
     }, [])
@@ -99,16 +149,11 @@ export default function Calendar(opt) {
         <section className="Calendar">
             <h1 className="title">{numberInMonth(new Date(opt.yearAndMonth).getMonth())}</h1>
             <div className="days">
-                {time.map(index => {
-                    if(isNaN(index)){
-                        return <button disabled>{index}</button>
-                    }
-                    if(index === 99){
-                        return <button disabled></button>
-                    }else {
-                        return <button>{index}</button>
-                    }
-                })}
+                {
+                    buttons.map(index => {
+                        return index;
+                    })
+                }
             </div>
         </section>
     )
